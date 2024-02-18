@@ -1,0 +1,12 @@
+1) cd door_management_files/door_configuration
+2) ls
+3) nano door_1.conf
+4) Ctrl+\
+5) CLOSED
+6) Enter
+7) OPEN
+8) Enter
+9) Ctrl+O
+10) Enter
+11) Ctrl+X
+
