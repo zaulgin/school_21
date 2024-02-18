@@ -5,13 +5,15 @@
 #define ERROR printf("n/a")
 
 void menu(int* choice);
-int inputDynamic(int** arr, int rows, int cols);
+int inputDynamic(int** arr, int rows, int cols);    
 void outputDynamic(int** arr, int rows, int cols);
-int inputStatic(int* arr, int cols);
-void outputStatic(int* arr, int cols);
+int inputStatic(int arr[ROWS][COLS], int rows, int cols);
+void outputStatic(int arr[ROWS][COLS], int rows, int cols);
 int inputRowsCols(int* rows, int* cols);
-void maxmin(int** arr, int rows, int cols);
-void maxminStatic(const int* arr, int* max, int* min, int cols);
+void maxRowElements(int** arr, int rows, int cols);
+void minColElements(int** arr, int rows, int cols);
+void maxRowElementsStatic(int arr[ROWS][COLS], int rows, int cols);
+void minColElementsStatic(int arr[ROWS][COLS], int rows, int cols);
 
 int main() {
     int choice = 0;
@@ -26,27 +28,14 @@ int main() {
                     return 1;
                 }
                 int staticArr[ROWS][COLS];
-                for (int i = 0; i < rows; i++) {
-                    if (inputStatic(&staticArr[i][0], cols)) {
-                        ERROR;
-                        return 1;
-                    }
+                if (inputStatic(staticArr, rows, cols)) {
+                    ERROR;
+                    return 1;
                 }
-                for (int i = 0; i < rows; i++) {
-                    outputStatic(&staticArr[i][0], cols);
-                    printf("\n");
-                }
-                int maxArr[COLS];
-                int minArr[COLS];
-                int min, max;
-                for (int i = 0; i < rows; i++) {
-                    maxminStatic(&staticArr[i][0], &min, &max, cols);
-                    maxArr[i] = min;
-                    minArr[i] = max;
-                }
-                outputStatic(maxArr, cols);
+                outputStatic(staticArr, rows, cols);
+                maxRowElementsStatic(staticArr, rows, cols);
                 printf("\n");
-                outputStatic(minArr, cols);
+                minColElementsStatic(staticArr, rows, cols);
                 break;
             //динамическая матрица (указатели к массивам)
             case 2:
@@ -67,7 +56,9 @@ int main() {
                     return 1;
                 }
                 outputDynamic(pointerArray, rows, cols);
-                maxmin(pointerArray, rows, cols);
+                maxRowElements(pointerArray, rows, cols);
+                printf("\n");
+                minColElements(pointerArray, rows, cols);
                 for (int i = 0; i < rows; i++) {
                     free(pointerArray[i]);
                 }
@@ -91,7 +82,9 @@ int main() {
                     return 1;
                 }
                 outputDynamic(pointerArrayToBuffer, rows, cols);
-                maxmin(pointerArrayToBuffer, rows, cols);
+                maxRowElements(pointerArrayToBuffer, rows, cols);
+                printf("\n");
+                minColElements(pointerArrayToBuffer, rows, cols);
                 free(valuesArray);
                 free(pointerArrayToBuffer);
                 break;
@@ -112,7 +105,9 @@ int main() {
                     return 1;
                 }
                 outputDynamic(singleArrayMatrix, rows, cols);
-                maxmin(singleArrayMatrix, rows, cols);
+                maxRowElements(singleArrayMatrix, rows, cols);
+                printf("\n");
+                minColElements(singleArrayMatrix, rows, cols);
                 free(singleArrayMatrix);
                 break;
             default:
@@ -159,58 +154,114 @@ int inputRowsCols(int* rows, int* cols) {
 
 void menu(int* choice) { scanf("%d", choice); }
 
-int inputStatic(int* arr, int cols) {
-    for (int* p = arr; p - arr < cols; p++) {
-        if (scanf("%d", p) != 1) {
-            return 1;
-        }
+int inputStatic(int arr[ROWS][COLS], int rows, int cols) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++)
+            if (scanf("%d", &arr[i][j]) != 1) {
+                return 1;
+            }
     }
     return 0;
 }
 
-void outputStatic(int* arr, int cols) {
-    for (int* p = arr; p - arr < cols; p++) {
-        if (p - arr == cols - 1) {
-            printf("%d", *p);
-        } else {
-            printf("%d ", *p);
+void outputStatic(int arr[ROWS][COLS], int rows, int cols) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (j == cols - 1) {
+                printf("%d\n", arr[i][j]);
+            } else {
+                printf("%d ", arr[i][j]);
+            }
         }
     }
 }
 
-void maxmin(int** arr, int rows, int cols) {
+void maxRowElements(int** arr, int rows, int cols) {
     int* maxArr = malloc(rows * sizeof(int));
-    int* minArr = malloc(rows * sizeof(int));
     for (int i = 0; i < rows; i++) {
         int max = arr[i][0];
-        int min = arr[i][0];
         for (int j = 0; j < cols; j++) {
             if (arr[i][j] > max) {
                 max = arr[i][j];
             }
-            if (arr[i][j] < min) {
-                min = arr[i][j];
+            maxArr[i] = max;
+        }
+    }
+
+    for (int i = 0; i < rows; i++) {
+        if (i == rows - 1) {
+            printf("%d", maxArr[i]);
+        } else {
+            printf("%d ", maxArr[i]);
+        }
+    }
+
+    free(maxArr);
+}
+
+void maxRowElementsStatic(int arr[ROWS][COLS], int rows, int cols) {
+    int* maxArr = malloc(rows * sizeof(int));
+    for (int i = 0; i < rows; i++) {
+        int max = arr[i][0];
+        for (int j = 0; j < cols; j++) {
+            if (arr[i][j] > max) {
+                max = arr[i][j];
             }
             maxArr[i] = max;
+        }
+    }
+
+    for (int i = 0; i < rows; i++) {
+        if (i == rows - 1) {
+            printf("%d", maxArr[i]);
+        } else {
+            printf("%d ", maxArr[i]);
+        }
+    }
+
+    free(maxArr);
+}
+
+void minColElements(int** arr, int rows, int cols) {
+    int* minArr = malloc(cols * sizeof(int));
+    for (int i = 0; i < cols; i++) {
+        int min = arr[0][i];
+        for (int j = 0; j < rows; j++) {
+            if (arr[j][i] < min) {
+                min = arr[j][i];
+            }
             minArr[i] = min;
         }
     }
-    outputStatic(maxArr, rows);
-    printf("\n");
-    outputStatic(minArr, rows);
-    free(maxArr);
+
+    for (int i = 0; i < cols; i++) {
+        if (i == cols - 1) {
+            printf("%d", minArr[i]);
+        } else {
+            printf("%d ", minArr[i]);
+        }
+    }
     free(minArr);
 }
 
-void maxminStatic(const int* arr, int* max, int* min, int cols) {
-    *max = arr[0];
-    *min = arr[0];
+void minColElementsStatic(int arr[ROWS][COLS], int rows, int cols) {
+    int* minArr = malloc(cols * sizeof(int));
     for (int i = 0; i < cols; i++) {
-        if (arr[i] > *max) {
-            *max = arr[i];
-        }
-        if (arr[i] < *min) {
-            *min = arr[i];
+        int min = arr[0][i];
+        for (int j = 0; j < rows; j++) {
+            if (arr[j][i] < min) {
+                min = arr[j][i];
+            }
+            minArr[i] = min;
         }
     }
+
+    for (int i = 0; i < cols; i++) {
+        if (i == cols - 1) {
+            printf("%d", minArr[i]);
+        } else {
+            printf("%d ", minArr[i]);
+        }
+    }
+    free(minArr);
 }
